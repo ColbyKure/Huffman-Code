@@ -57,14 +57,22 @@ void compressAscii(const string & infile, const string & outfile) {
     //build tree
     HCTree tree;
     tree.build(freqs);
+    tree.getEncodings();
     
     //get to beginning again
     in.seekg(0, ios_base::beg);
 
+    //open out stream
+    ofstream out(outfile.c_str());
+    if(!out.is_open()) {
+        cout << outfile << " not opened!\n";
+        return -1;
+    }
+
     while(getline(in, line)) {
         for(char & ch : line) {
-            //difference between byte and char?
-            //call encode 
+            out << 
+  
         }
     }
     

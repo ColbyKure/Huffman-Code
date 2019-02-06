@@ -19,7 +19,7 @@ HCTree::~HCTree() {
 }
 
 /**
- * helper for recursive deletion of nodes
+ * helper for recursive deletion of nodes in tree
  */
 void deleteTree(HCNode * subroot) {
     if(subroot->c0 == nullptr) {
@@ -39,7 +39,10 @@ void deleteTree(HCNode * subroot) {
  *  and leaves[i] points to the leaf node containing byte i.
  */
 void HCTree::build(const vector<int>& freqs) {
-    // TODO (checkpoint)
+    if(root != nullptr) {
+        deleteTree(root);
+    }
+
     priority_queue<HCNode*, vector<HCNode*>, HCNodePtrComp> pqueue;
 
     //create leaf node for each symbol
@@ -75,13 +78,50 @@ void HCTree::build(const vector<int>& freqs) {
             newSym = left.symbol;
         }
         parent = new HCNode(pCount, newSym, left, right);
+        left->p = parent;
+        right->p = parent;
 
         //add back into pqueue
         pqueue.push(parent);
     }
-    
+    root = parent;
+
     return;
 }
+
+/**
+ * creates vector where index is char and value at index 
+ * is a string of 0 and 1's 
+ */
+void getEncodings() {
+    HCNode * leaf;
+    for(int i = 0; i < 256; ++i) {
+        if(leaves[i] != nullptr) {
+            leaf = leaves[i];
+            string path = getPath(leaf, nullptr);
+            encodings[i] = new string(path);
+        }
+    }
+}
+
+/**
+ * takes the leaf node and finds the path up to the root 
+ * keeping track of the path and then reversing it
+ */
+string getPath(HCNode * leaf, HCNode * prev) {
+    string path = nullptr;
+    if(leaf->parent != nullptr) {
+        path = getPath(leaf->parent, leaf);
+    }
+    if(leaf->left == prev) {
+        //careful base case size 1 and 0 tree
+        return '0' + path;
+    }
+    else {
+        return '1' + path;
+    }
+}
+
 
 /** Write to the given ostream
  *  the sequence of bits (as ASCII) coding the given symbol.
@@ -90,13 +130,13 @@ void HCTree::build(const vector<int>& freqs) {
  */
 void HCTree::encode(byte symbol, ostream& out) const {
     // TODO (checkpoint)
-    byte encodedSymbol;
+    string encodedSymbol;
     if(leaves[(int)symbol] == nullptr) {
         //error symbol not found in file
         //      or something wrong with leaves
         return -1;
     }
-
+    encodedSymbol = encodings[(int) symbol];
     out << encodedSymbol;
     return;
 }

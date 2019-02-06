@@ -30,6 +30,7 @@ class HCTree {
 private:
     HCNode* root;
     vector<HCNode*> leaves;
+    vector<char*> encodings;
 
     /**
      * Recursive helper function for printTree
@@ -46,6 +47,7 @@ public:
      */
     explicit HCTree() : root(0) {
         leaves = vector<HCNode*>(256, (HCNode*) 0);
+        encodings = vector<char*>(256, (char*) 0);
     }
 
     /** Destructor for HCTree
