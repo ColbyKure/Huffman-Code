@@ -36,6 +36,11 @@ private:
      */
     void printTreeHelper(HCNode * node, string indent = "") const;
 
+    /**
+     * Recursive helper for Destructor
+     */
+    bool deleteTree(HCNode * subroot);
+
 public:
     /** Constructor for HCTree
      */

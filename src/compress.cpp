@@ -22,9 +22,58 @@ void print_usage(char ** argv) {
  * For debugging purposes, uses ASCII '0' and '1' rather than bitwise I/O.
  */
 void compressAscii(const string & infile, const string & outfile) {
-    // TODO (checkpoint)
     cerr << "TODO: compress '" << infile << "' -> '"
         << outfile << "' here (ASCII)" << endl;
+    //open file 
+    ifstream in;
+    in.open(infile.c_str(), ios::binary);
+
+    //check if file actually opened 
+    if(!in.is_open()) {
+        cout << "input file was not opened...\n";
+        return -1;
+    }
+
+    //check for empty file
+    in.seekg(0, ios_base::end);
+    unsigned int len = in.tellg();
+    if(len == 0) {
+        cout << "input file opened but empty\n";
+        return -1;
+    }
+
+    //find beginning of stream
+    in.seekg(0, ios_base::beg);
+    
+    //read lines from stream
+    string line;
+    vector<int> freqs(256, 0); //one slot per ascii value = 0
+    while(getine(in, line)) {
+        for(char& ch : line) {
+            freqs[(int)ch]++;
+        }
+    }
+
+    //build tree
+    HCTree tree;
+    tree.build(freqs);
+    
+    //get to beginning again
+    in.seekg(0, ios_base::beg);
+
+    while(getline(in, line)) {
+        for(char & ch : line) {
+            //difference between byte and char?
+            //call encode 
+        }
+    }
+    
+    //close file
+    if(in.is_open()) {
+        in.close();
+    }
+
+    return 0;
 }
 
 /**
