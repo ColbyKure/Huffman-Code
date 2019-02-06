@@ -104,7 +104,9 @@ TEST_CASE("Handle ties: ASCII encoding and decoding") {
     freqs[54] = 250;
     tree.build(freqs);
 
-    //tree.printTree();
+    cout << "printing tree\n";
+    tree.printTree();
+    cout << "done printing tree\n";
 
     ostringstream oss;
 

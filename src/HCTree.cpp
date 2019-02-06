@@ -23,10 +23,10 @@ HCTree::~HCTree() {
  */
 void deleteTree(HCNode * subroot) {
     if(subroot->c0 == nullptr) {
-        deleteTree(root->c0);
+        deleteTree(subroot->c0);
     }
     if(subroot->c1 == nullptr) {
-        deleteTree(root->c1);
+        deleteTree(subroot->c1);
     }
     delete(subroot);
     return;
@@ -54,6 +54,9 @@ void HCTree::build(const vector<int>& freqs) {
             pqueue.push(tmp);
             forestCount++;
         }
+    }
+    if(forestCount == 0) {
+        root = nullptr;
     }
 
     //get top 2 leaf nodes from pqueue to make subtree
@@ -129,14 +132,12 @@ string getPath(HCNode * leaf, HCNode * prev) {
  *  tree, and initialize root pointer and leaves vector.
  */
 void HCTree::encode(byte symbol, ostream& out) const {
-    // TODO (checkpoint)
     string encodedSymbol;
     if(leaves[(int)symbol] == nullptr) {
-        //error symbol not found in file
-        //      or something wrong with leaves
+        cout << "did not find symbol\n";
         return -1;
     }
-    encodedSymbol = encodings[(int) symbol];
+    encodedSymbol = encodings[(int)symbol];
     out << encodedSymbol;
     return;
 }
@@ -147,12 +148,24 @@ void HCTree::encode(byte symbol, ostream& out) const {
  *  tree, and initialize root pointer and leaves vector.
  */
 byte HCTree::decode(istream& in) const {
-    //TODO (checkpoint)
-    //how to delete from front in istream
-    //traverse tree until istream is empty
-    //  when reach leafnode 
-    //     write char and 
-    //     set durr to root
+    HCNode * curr = root;
+    unsigned char nextChar;
+    in >> nextChar;
+    while(true) {
+        if(in.eof()) {
+            break;
+        }
+        if(curr->left == nullptr) {
+            //curr must be leaf node
+            return curr->symbol;
+        }
+        if(nextChar == '0') {
+            curr = curr->left;
+        }
+        else {
+            curr = curr->right;
+        }
+    }
     return 0;
 }
 
