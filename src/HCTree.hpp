@@ -30,7 +30,7 @@ class HCTree {
 private:
     HCNode* root;
     vector<HCNode*> leaves;
-    vector<char*> encodings;
+    vector<const char*> encodings;
 
     /**
      * Recursive helper function for printTree
@@ -40,14 +40,26 @@ private:
     /**
      * Recursive helper for Destructor
      */
-    bool deleteTree(HCNode * subroot);
+    void deleteTree(HCNode * subroot);
+
+    /**
+     * gets the binary encoding for for each symbol and 
+     * loads then as char*'s in encodings 
+     */
+    void getEncodings();
+
+    /**
+     * gets the path up to the root recursivly and returns it as a 
+     * string
+     */
+    string getPath(HCNode * leaf, HCNode * prev);
 
 public:
     /** Constructor for HCTree
      */
     explicit HCTree() : root(0) {
         leaves = vector<HCNode*>(256, (HCNode*) 0);
-        encodings = vector<char*>(256, (char*) 0);
+        encodings = vector<const char*>(256, (char*) 0);
     }
 
     /** Destructor for HCTree

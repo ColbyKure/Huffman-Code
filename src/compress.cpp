@@ -26,7 +26,8 @@ void compressAscii(const string & infile, const string & outfile) {
         << outfile << "' here (ASCII)" << endl;
     //open file 
     ifstream in;
-    in.open(infile.c_str(), ios::binary);
+    char * input = infile().c_str();
+    in.open(input, ios::binary);
 
     //check if file actually opened 
     if(!in.is_open()) {
@@ -63,7 +64,8 @@ void compressAscii(const string & infile, const string & outfile) {
     in.seekg(0, ios_base::beg);
 
     //open out stream
-    ofstream out(outfile.c_str());
+    char * output = outfile.c_str();
+    ofstream out(output);
     if(!out.is_open()) {
         cout << outfile << " not opened!\n";
         return -1;
@@ -71,15 +73,22 @@ void compressAscii(const string & infile, const string & outfile) {
 
     while(getline(in, line)) {
         for(char & ch : line) {
-            out << 
-  
+            encode((byte)ch, out);
         }
     }
+
     
-    //close file
+    //close files
+    if(out.is_open()) {
+        out.close();
+    }
     if(in.is_open()) {
         in.close();
     }
+
+    //delete dynamically allocated memory
+    delete[] input;
+    delete[] output;
 
     return 0;
 }

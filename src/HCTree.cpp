@@ -8,6 +8,10 @@
  * Destructor for HCTree
  */
 HCTree::~HCTree() {
+    if(root == nullptr) {
+        return;
+    }
+
     if(root->c0 == nullptr) {
         deleteTree(root->c0);
     }
@@ -15,13 +19,17 @@ HCTree::~HCTree() {
         deleteTree(root->c1);
     }
     delete(root);
+    //delete encodings 
+    for(unsigned int i = 0; i < encodings.size(); ++i) {
+        delete[] encodings[i];
+    }
     return;
 }
 
 /**
  * helper for recursive deletion of nodes in tree
  */
-void deleteTree(HCNode * subroot) {
+void HCTree::deleteTree(HCNode * subroot) {
     if(subroot->c0 == nullptr) {
         deleteTree(subroot->c0);
     }
@@ -47,7 +55,7 @@ void HCTree::build(const vector<int>& freqs) {
 
     //create leaf node for each symbol
     int forestCount = 0;
-    for(int i = 0; i < freqs.size(); i++) {
+    for(unsigned int i = 0; i < freqs.size(); i++) {
         if(freqs[i] > 0) {
             HCNode * tmp = new HCNode(freqs[i], (byte)i);
             leaves[i] = tmp;
@@ -74,11 +82,11 @@ void HCTree::build(const vector<int>& freqs) {
 
         //create new parent node
         pCount = left->count + right->count;
-        if(left.symbol < right.symbol) {
-            newSym = right.symbol;
+        if(left->symbol < right->symbol) {
+            newSym = right->symbol;
         }
         else {
-            newSym = left.symbol;
+            newSym = left->symbol;
         }
         parent = new HCNode(pCount, newSym, left, right);
         left->p = parent;
@@ -96,13 +104,13 @@ void HCTree::build(const vector<int>& freqs) {
  * creates vector where index is char and value at index 
  * is a string of 0 and 1's 
  */
-void getEncodings() {
+void HCTree::getEncodings() {
     HCNode * leaf;
     for(int i = 0; i < 256; ++i) {
         if(leaves[i] != nullptr) {
             leaf = leaves[i];
             string path = getPath(leaf, nullptr);
-            encodings[i] = new string(path);
+            encodings[i] = path.c_str();
         }
     }
 }
@@ -111,12 +119,12 @@ void getEncodings() {
  * takes the leaf node and finds the path up to the root 
  * keeping track of the path and then reversing it
  */
-string getPath(HCNode * leaf, HCNode * prev) {
+string HCTree::getPath(HCNode * leaf, HCNode * prev) {
     string path = nullptr;
-    if(leaf->parent != nullptr) {
-        path = getPath(leaf->parent, leaf);
+    if(leaf->p != nullptr) {
+        path = getPath(leaf->p, leaf);
     }
-    if(leaf->left == prev) {
+    if(leaf->c0 == prev) {
         //careful base case size 1 and 0 tree
         return '0' + path;
     }
@@ -135,7 +143,7 @@ void HCTree::encode(byte symbol, ostream& out) const {
     string encodedSymbol;
     if(leaves[(int)symbol] == nullptr) {
         cout << "did not find symbol\n";
-        return -1;
+        return;
     }
     encodedSymbol = encodings[(int)symbol];
     out << encodedSymbol;
@@ -155,15 +163,15 @@ byte HCTree::decode(istream& in) const {
         if(in.eof()) {
             break;
         }
-        if(curr->left == nullptr) {
+        if(curr->c0 == nullptr) {
             //curr must be leaf node
             return curr->symbol;
         }
         if(nextChar == '0') {
-            curr = curr->left;
+            curr = curr->c0;
         }
         else {
-            curr = curr->right;
+            curr = curr->c1;
         }
     }
     return 0;
