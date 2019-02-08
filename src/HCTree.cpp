@@ -19,10 +19,6 @@ HCTree::~HCTree() {
         deleteTree(root->c1);
     }
     delete(root);
-    //delete encodings 
-    for(unsigned int i = 0; i < encodings.size(); ++i) {
-        delete[] encodings[i];
-    }
     return;
 }
 
@@ -30,10 +26,10 @@ HCTree::~HCTree() {
  * helper for recursive deletion of nodes in tree
  */
 void HCTree::deleteTree(HCNode * subroot) {
-    if(subroot->c0 == nullptr) {
+    if(subroot->c0 != nullptr) {
         deleteTree(subroot->c0);
     }
-    if(subroot->c1 == nullptr) {
+    if(subroot->c1 != nullptr) {
         deleteTree(subroot->c1);
     }
     delete(subroot);
@@ -71,7 +67,7 @@ void HCTree::build(const vector<int>& freqs) {
     HCNode * left;
     HCNode * right;
     HCNode * parent;
-    int pCount = 0;
+    int pCount = 0; //parent count
     byte newSym = 0;
     for(int i = forestCount; i > 1; --i) {
         //save pop first 2 from pqueue
@@ -97,6 +93,7 @@ void HCTree::build(const vector<int>& freqs) {
     }
     root = parent;
 
+    getEncodings();
     return;
 }
 
@@ -120,19 +117,21 @@ void HCTree::getEncodings() {
  * keeping track of the path and then reversing it
  */
 string HCTree::getPath(HCNode * leaf, HCNode * prev) {
-    string path = nullptr;
+    string path;
     if(leaf->p != nullptr) {
         path = getPath(leaf->p, leaf);
     }
+    if(prev == nullptr) {
+        return path;
+    }
     if(leaf->c0 == prev) {
         //careful base case size 1 and 0 tree
-        return '0' + path;
+        return path + '0';
     }
     else {
-        return '1' + path;
+        return path + '1';
     }
 }
-
 
 /** Write to the given ostream
  *  the sequence of bits (as ASCII) coding the given symbol.
@@ -160,19 +159,20 @@ byte HCTree::decode(istream& in) const {
     unsigned char nextChar;
     in >> nextChar;
     while(true) {
-        if(in.eof()) {
-            break;
-        }
-        if(curr->c0 == nullptr) {
-            //curr must be leaf node
-            return curr->symbol;
-        }
         if(nextChar == '0') {
             curr = curr->c0;
         }
         else {
             curr = curr->c1;
         }
+        if(curr->c0 == nullptr) {
+            //curr must be leaf node
+            return curr->symbol;
+        }
+        if(in.eof()) {
+            break;
+        }
+        in >> nextChar;
     }
     return 0;
 }
