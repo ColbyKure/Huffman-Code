@@ -12,13 +12,19 @@ HCTree::~HCTree() {
         return;
     }
 
-    if(root->c0 == nullptr) {
+    if(root->c0 != nullptr) {
         deleteTree(root->c0);
     }
-    if(root->c1 == nullptr) {
+    if(root->c1 != nullptr) {
         deleteTree(root->c1);
     }
     delete(root);
+cout << "destroyed node\n";
+
+    for(int i = 0; i < 256; ++i) {
+        leaves[i] = nullptr;
+        encodings[i] = "";
+    }
     return;
 }
 
@@ -33,6 +39,7 @@ void HCTree::deleteTree(HCNode * subroot) {
         deleteTree(subroot->c1);
     }
     delete(subroot);
+cout << "destroyed node\n";
     return;
 }
 
@@ -58,6 +65,7 @@ void HCTree::build(const vector<int>& freqs) {
     for(unsigned int i = 0; i < freqs.size(); i++) {
         if(freqs[i] > 0) {
             HCNode * tmp = new HCNode(freqs[i], (byte)i);
+cout << "made node\n";
             leaves[i] = tmp;
             pqueue.push(tmp);
             forestCount++;
@@ -89,6 +97,7 @@ void HCTree::build(const vector<int>& freqs) {
             newSym = left->symbol;
         }
         parent = new HCNode(pCount, newSym, left, right);
+cout << "made node\n";
         left->p = parent;
         right->p = parent;
 
