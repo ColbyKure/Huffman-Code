@@ -67,8 +67,6 @@ for(int i = 1; i <= 256; ++i) {
     tree.build(freqs);
     
     //get to beginning again
-    in.seekg(0, ios_base::beg);
-cout << "built tree seeking begning (again)\n";
     //open out stream
     const char * output = outfile.c_str();
     ofstream out(output);
@@ -82,8 +80,18 @@ cout << "outfile is open\n";
         out << freqs[i] << endl;
     }
 
+    if(in.is_open()) {
+        in.close();
+    }
+
+    in.open(input, ios::binary); //reopen input
+
+    in.seekg(0, ios_base::beg);
+cout << "built tree seeking begning (again)\n";
+
     while((nextByte = in.get()) != EOF) { //read infile again
         nextChar = (unsigned char) nextByte;
+cout << "calling encode(char, byte) " << nextChar << "; " << nextByte << endl;
         tree.encode(nextChar, out);
     }
 
