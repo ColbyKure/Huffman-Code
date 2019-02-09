@@ -26,55 +26,65 @@ void compressAscii(const string & infile, const string & outfile) {
         << outfile << "' here (ASCII)" << endl;
     //open file 
     ifstream in;
-    char * input = infile().c_str();
+    const char * input = infile.c_str();
     in.open(input, ios::binary);
 
     //check if file actually opened 
     if(!in.is_open()) {
         cout << "input file was not opened...\n";
-        return -1;
+        return;
     }
+cout << "infile open";
 
     //check for empty file
     in.seekg(0, ios_base::end);
     unsigned int len = in.tellg();
     if(len == 0) {
         cout << "input file opened but empty\n";
-        return -1;
+        return;
     }
+cout << "non-empty file seeking beginnning\n";
 
     //find beginning of stream
     in.seekg(0, ios_base::beg);
-    
+
     //read lines from stream
-    string line;
     vector<int> freqs(256, 0); //one slot per ascii value = 0
-    while(getine(in, line)) {
-        for(char& ch : line) {
-            freqs[(int)ch]++;
-        }
+    unsigned char nextChar;
+    int nextByte, index;
+    while((nextByte = in.get()) != EOF) {
+        nextChar = (unsigned char) nextByte;
+        index = (int)nextChar;
+        freqs[index] = freqs[index] + 1;
     }
+cout << "got frequencies\n";
+for(int i = 1; i <= 256; ++i) {
+    cout << "line "<< i << " : " << freqs[i-1] << endl;
+}
 
     //build tree
     HCTree tree;
     tree.build(freqs);
-    tree.getEncodings();
     
     //get to beginning again
     in.seekg(0, ios_base::beg);
-
+cout << "built tree seeking begning (again)\n";
     //open out stream
-    char * output = outfile.c_str();
+    const char * output = outfile.c_str();
     ofstream out(output);
     if(!out.is_open()) {
         cout << outfile << " not opened!\n";
-        return -1;
+        return;
+    }
+cout << "outfile is open\n";
+    //output header
+    for(int i = 0; i < 256; ++i) {
+        out << freqs[i] << endl;
     }
 
-    while(getline(in, line)) {
-        for(char & ch : line) {
-            encode((byte)ch, out);
-        }
+    while((nextByte = in.get()) != EOF) { //read infile again
+        nextChar = (unsigned char) nextByte;
+        tree.encode(nextChar, out);
     }
 
     
@@ -86,11 +96,7 @@ void compressAscii(const string & infile, const string & outfile) {
         in.close();
     }
 
-    //delete dynamically allocated memory
-    delete[] input;
-    delete[] output;
-
-    return 0;
+    return;
 }
 
 /**
