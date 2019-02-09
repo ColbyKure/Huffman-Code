@@ -60,7 +60,6 @@ void compressAscii(const string & infile, const string & outfile) {
     HCTree tree;
     tree.build(freqs);
     
-    //get to beginning again
     //open out stream
     const char * output = outfile.c_str();
     ofstream out(output);

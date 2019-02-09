@@ -45,6 +45,10 @@ void HCTree::deleteTree(HCNode * subroot) {
 void HCTree::build(const vector<int>& freqs) {
     if(root != nullptr) {
         deleteTree(root);
+        for(int i = 0; i < 256; ++i) {
+            leaves[i] = nullptr;
+            encodings[i] = "";
+        }
     }
 
     priority_queue<HCNode*, vector<HCNode*>, HCNodePtrComp> pqueue;
