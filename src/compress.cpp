@@ -34,7 +34,6 @@ void compressAscii(const string & infile, const string & outfile) {
         cout << "input file was not opened...\n";
         return;
     }
-cout << "infile open";
 
     //check for empty file
     in.seekg(0, ios_base::end);
@@ -43,7 +42,6 @@ cout << "infile open";
         cout << "input file opened but empty\n";
         return;
     }
-cout << "non-empty file seeking beginnning\n";
 
     //find beginning of stream
     in.seekg(0, ios_base::beg);
@@ -57,10 +55,6 @@ cout << "non-empty file seeking beginnning\n";
         index = (int)nextChar;
         freqs[index] = freqs[index] + 1;
     }
-cout << "got frequencies\n";
-for(int i = 1; i <= 256; ++i) {
-    cout << "line "<< i << " : " << freqs[i-1] << endl;
-}
 
     //build tree
     HCTree tree;
@@ -74,7 +68,6 @@ for(int i = 1; i <= 256; ++i) {
         cout << outfile << " not opened!\n";
         return;
     }
-cout << "outfile is open\n";
     //output header
     for(int i = 0; i < 256; ++i) {
         out << freqs[i] << endl;
@@ -87,11 +80,9 @@ cout << "outfile is open\n";
     in.open(input, ios::binary); //reopen input
 
     in.seekg(0, ios_base::beg);
-cout << "built tree seeking begning (again)\n";
 
     while((nextByte = in.get()) != EOF) { //read infile again
         nextChar = (unsigned char) nextByte;
-cout << "calling encode(char, byte) " << nextChar << "; " << nextByte << endl;
         tree.encode(nextChar, out);
     }
 
