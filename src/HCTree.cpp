@@ -19,7 +19,6 @@ HCTree::~HCTree() {
         deleteTree(root->c1);
     }
     delete(root);
-cout << "destroyed node\n";
 
     for(int i = 0; i < 256; ++i) {
         leaves[i] = nullptr;
@@ -39,7 +38,6 @@ void HCTree::deleteTree(HCNode * subroot) {
         deleteTree(subroot->c1);
     }
     delete(subroot);
-cout << "destroyed node\n";
     return;
 }
 
@@ -65,7 +63,6 @@ void HCTree::build(const vector<int>& freqs) {
     for(unsigned int i = 0; i < freqs.size(); i++) {
         if(freqs[i] > 0) {
             HCNode * tmp = new HCNode(freqs[i], (byte)i);
-cout << "made node\n";
             leaves[i] = tmp;
             pqueue.push(tmp);
             forestCount++;
@@ -97,10 +94,8 @@ cout << "made node\n";
             newSym = left->symbol;
         }
         parent = new HCNode(pCount, newSym, left, right);
-cout << "made node\n";
         left->p = parent;
         right->p = parent;
-
         //add back into pqueue
         pqueue.push(parent);
     }
@@ -198,7 +193,22 @@ byte HCTree::decode(istream& in) const {
  *  tree, and initialize root pointer and leaves vector.
  */
 void HCTree::encode(byte symbol, BitOutputStream& out) const {
-    // TODO (final)
+    string encodedSymbol;
+    if(leaves[(int)symbol] == nullptr) {
+        cout << "did not find symbol\n";
+        return;
+    }
+    encodedSymbol = encodings[(int)symbol];
+    for (unsigned int i = 0; i < encodedSymbol.size(); i++){
+        if (encodedSymbol[i] == '0'){
+            out.writeBit(0); //false
+        }
+        else {
+            out.writeBit(1); //true
+        }
+    }
+    out.flush();
+    return;
 }
 
 /** Return symbol coded in the next sequence of bits from the stream.
@@ -206,8 +216,25 @@ void HCTree::encode(byte symbol, BitOutputStream& out) const {
  *  tree, and initialize root pointer and leaves vector.
  */
 byte HCTree::decode(BitInputStream& in) const {
-    return 0;  // TODO (final)
+    HCNode * curr = root;
+    while(true) {
+        if(!in.readBit()) { //false
+            curr = curr->c0;
+        }
+        else {
+            curr = curr->c1;
+        }
+        if(curr->c0 == nullptr) {
+            //curr must be leaf node
+            return curr->symbol;
+        }
+        if (in.eof == 1){
+            break;    
+        }
+    }
+    return 0;
 }
+
 
 /**
  * Print the contents of a tree

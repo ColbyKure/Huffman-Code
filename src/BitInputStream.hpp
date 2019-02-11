@@ -7,11 +7,16 @@ using namespace std;
 
 class BitInputStream {
 private:
+    char buf;
+    int nbits;
     istream & in;
+    bool eof;
 
 public:
     BitInputStream(istream & i);
     bool readBit();
+
+    
 };
 
 #endif // BITINPUTSTREAM_HPP
