@@ -8,6 +8,8 @@
 #include "HCTree.hpp"
 #include "BitInputStream.hpp"
 
+#define MAX_CHAR 256
+
 using namespace std;
 
 void print_usage(char ** argv) {
@@ -42,9 +44,9 @@ void uncompressAscii(const string & infile, const string & outfile) {
     in.seekg(0, ios_base::beg);
 
     //read lines from header 
-    vector<int> freqs(256, 0); //one slot per ascii value = 0
+    vector<int> freqs(MAX_CHAR, 0); //one slot per ascii value = 0
     int nextInt;
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MAX_CHAR; i++) {
     	in >> nextInt;
     	freqs[i] = nextInt;
     }
@@ -58,17 +60,17 @@ void uncompressAscii(const string & infile, const string & outfile) {
     ofstream out(output);
     if(!out.is_open()){
         cout << outfile << " not opened!\n";
-	return;
+	    return;
     }
     
     unsigned char nextChar; //for reading output
 
     while(1) {
     	nextChar = tree.decode(in);
-	if (in.eof()){
-	    break;
-	}
-	out << nextChar;
+	    if (in.eof()){
+	        break;
+	    }
+	    out << nextChar;
     }
 
     //close files
@@ -93,6 +95,61 @@ void uncompressBitwise(const string & infile, const string & outfile) {
     // TODO (final)
     cerr << "TODO: uncompress '" << infile << "' -> '"
         << outfile << "' here (bitwise)" << endl;
+    //open file 
+    filebuf inF;
+    const char * input = infile.c_str();
+    inF.open(input, ios::binary);
+
+    //check if file actually opened 
+    /*if(!inF.is_open()) {
+        cout << "input file was not opened(bitwise)...\n";
+        return;
+    }*/
+
+    istream inS(&inF);
+
+    //find beginning of stream
+    inS.seekg(0, ios_base::beg);
+
+    BitInputStream in(inS); 
+
+    //read lines from header 
+    vector<int> freqs(256, 0); //one slot per ascii value = 0
+    unsigned int nextInt;
+    unsigned int totalChars = 0;
+    for (int i = 0; i < 256; i++) {
+    	nextInt = in.getInt(); 
+    	freqs[i] = nextInt;
+        totalChars += nextInt;
+    }
+
+    //build tree
+    HCTree tree;
+    tree.build(freqs);
+
+    //open out stream
+    const char * output = outfile.c_str();
+    ofstream out(output);
+    if(!out.is_open()){
+        cout << outfile << " not opened!\n";
+	    return;
+    }
+    
+    unsigned char nextChar; //for reading output
+
+    for(unsigned int i = 0; i < totalChars; ++i) {
+    	nextChar = tree.decode(in);
+	    out << nextChar;
+    }
+
+    //close files
+    if(out.is_open()){
+    	out.close();
+    }
+
+    if(inF.is_open()){
+    	inF.close();
+    }
 }
 
 int main(int argc, char ** argv) {
