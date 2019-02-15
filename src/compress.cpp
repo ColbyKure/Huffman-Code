@@ -146,8 +146,10 @@ void compressBitwise(const string & infile, const string & outfile) {
     
     //open out stream
     const char * output = outfile.c_str();
-    ostream outS(output);
-    BitOutputStream * out(outS);
+    filebuf outBuf;
+    outBuf.open(output, ios_base::binary);    
+    ostream outS(&outBuf);
+    BitOutputStream out(outS);
     
     //output header
     unsigned int currentFreqs;
@@ -182,19 +184,7 @@ void compressBitwise(const string & infile, const string & outfile) {
         in.close();
     }
     
-    ofstream out(output);
-    if(!out.is_open()) {
-        cout << outfile << " not opened!\n";
-        return;
-    }
-    //output header
-    for(int i = 0; i < 256; ++i) {
-        out << freqs[i] << endl;
-    }
-
-    if(in.is_open()) {
-        in.close();
-    }
+    return;
 }
 
 int main(int argc, char ** argv) {
