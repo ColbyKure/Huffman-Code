@@ -228,9 +228,6 @@ byte HCTree::decode(BitInputStream& in) const {
             //curr must be leaf node
             return curr->symbol;
         }
-        if (in.eof == 1){
-            break;    
-        }
     }
     return 0;
 }

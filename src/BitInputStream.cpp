@@ -1,46 +1,31 @@
 #include "BitInputStream.hpp"
 
-
 BitInputStream::BitInputStream(istream & i) : in(i) {
-    buf = 0;
+    buf = BITS_IN_BYTE;
     nbits = 0;
-
-    if(i.is_open()){
-        eof = 0;
-    }
-    else{
-        eof = 1;    
-    }
 }
 
 bool BitInputStream::readBit() {
-    if(buf == 0){
-        //load buffer
-        in >> buf;
-        if(in.eof()) {
-            eof = 1;
-        }
+    if (nbits == BITS_IN_BYTE) {
+        buf = in.get();
         nbits = 0;
     }
 
-    unsigned char mask = 0x1; 
-    mask = mask << (7 - nbits);
+    unsigned char mask = DEF_MASK; 
+    mask = mask << (BITS_IN_BYTE - nbits - 1);
     mask = mask & buf;
-    nbits ++;
+    nbits++;
 
-    if (nbits == 8){
-        in >> buf;    
-        if(in.eof()) {
-            eof = 1;
-        }
-        nbits = 0;
+    if(mask != 0) {
+        return true;
     }
-
-    if(mask == 0){
-        return false;    
-    }
-
     else {
-        return true;    
-    };
+        return false;
+    }
+}
+
+unsigned char BitInputStream::getInt() {
+    unsigned char freq = -1;
+    in >> freq;
+    return freq;
 }

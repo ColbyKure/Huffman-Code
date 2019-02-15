@@ -7,6 +7,8 @@
 #include "HCTree.hpp"
 #include "BitOutputStream.hpp"
 
+#define MAX_CHAR 256
+
 using namespace std;
 
 void print_usage(char ** argv) {
@@ -47,7 +49,7 @@ void compressAscii(const string & infile, const string & outfile) {
     in.seekg(0, ios_base::beg);
 
     //read lines from stream
-    vector<int> freqs(256, 0); //one slot per ascii value = 0
+    vector<int> freqs(MAX_CHAR, 0); //one slot per ascii value = 0
     unsigned char nextChar;
     int nextByte, index;
     while((nextByte = in.get()) != EOF) {
@@ -68,7 +70,7 @@ void compressAscii(const string & infile, const string & outfile) {
         return;
     }
     //output header
-    for(int i = 0; i < 256; ++i) {
+    for(int i = 0; i < MAX_CHAR; ++i) {
         out << freqs[i] << endl;
     }
 
@@ -106,7 +108,7 @@ void compressBitwise(const string & infile, const string & outfile) {
     // TODO (final)
     cerr << "TODO: compress '" << infile << "' -> '"
         << outfile << "' here (bitwise)" << endl;
-    
+    //open file 
     ifstream in;
     const char * input = infile.c_str();
     in.open(input, ios::binary);
@@ -130,6 +132,7 @@ void compressBitwise(const string & infile, const string & outfile) {
 
     //read lines from stream
     vector<int> freqs(256, 0); 
+    vector<int> freqs(256, 0); //one slot per ascii value = 0
     unsigned char nextChar;
     int nextByte, index;
     while((nextByte = in.get()) != EOF) {
@@ -187,6 +190,19 @@ void compressBitwise(const string & infile, const string & outfile) {
     if(in.is_open()) {
         in.close();
     }
+    
+    ofstream out(output);
+    if(!out.is_open()) {
+        cout << outfile << " not opened!\n";
+        return;
+    }
+    //output header
+    for(int i = 0; i < 256; ++i) {
+        out << freqs[i] << endl;
+    }
+
+    if(in.is_open()) {
+        in.close();
 }
 
 int main(int argc, char ** argv) {

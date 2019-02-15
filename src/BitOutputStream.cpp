@@ -6,20 +6,23 @@ BitOutputStream::BitOutputStream(ostream & o) : out(o) {
 }
 
 void BitOutputStream::writeBit(bool bit) {
-    if(nbits == 8){
+    if(nbits == BITS_IN_BYTE){
         flush();
-        buf = 0;
     }
-    
-    if (bit == 1){ //true
-        byte mask = 0x1; 
-        mask = mask << (7 - nbits);
-        mask = mask | buf;   
+
+    if(bit == 1){ //true
+        unsigned char mask = DEF_MASK;
+        mask = mask << (BITS_IN_BYTE - nbits - 1);
+        mask = mask | buf;
     }
+
     nbits++;
     return;
 }
 
 void BitOutputStream::flush(){
-    out << buf;
+    out.put(buf);
+    out.flush();
+    buf = 0;
+    return;
 }
