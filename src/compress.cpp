@@ -132,7 +132,6 @@ void compressBitwise(const string & infile, const string & outfile) {
 
     //read lines from stream
     vector<int> freqs(256, 0); 
-    vector<int> freqs(256, 0); //one slot per ascii value = 0
     unsigned char nextChar;
     int nextByte, index;
     while((nextByte = in.get()) != EOF) {
@@ -148,7 +147,7 @@ void compressBitwise(const string & infile, const string & outfile) {
     //open out stream
     const char * output = outfile.c_str();
     ostream outS(output);
-    BitOutputStream out(outS);
+    BitOutputStream * out(outS);
     
     //output header
     unsigned int currentFreqs;
@@ -156,7 +155,7 @@ void compressBitwise(const string & infile, const string & outfile) {
     mask = mask << 31;
     for(int i = 0; i < 256; ++i) {
 	currentFreqs = freqs[i]; 
-	for (int k = 0; k < 32, k++){
+	for (int k = 0; k < 32; ++k){
             currentFreqs = currentFreqs & mask;
 	    if (currentFreqs != 0){ //if the bit is one
 	    	out.writeBit(1);
@@ -171,8 +170,6 @@ void compressBitwise(const string & infile, const string & outfile) {
         in.close();
     }
 
-    in.open(input, ios::binary); //reopen input
-
     in.seekg(0, ios_base::beg);
 
     while((nextByte = in.get()) != EOF) { //read infile again
@@ -180,13 +177,7 @@ void compressBitwise(const string & infile, const string & outfile) {
         tree.encode(nextChar, out);
     }
     
-    
-    
     //close files
-   if(outS.is_open()) {
-
-        outS.close();
-    }
     if(in.is_open()) {
         in.close();
     }
@@ -203,6 +194,7 @@ void compressBitwise(const string & infile, const string & outfile) {
 
     if(in.is_open()) {
         in.close();
+    }
 }
 
 int main(int argc, char ** argv) {
