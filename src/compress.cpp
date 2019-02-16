@@ -24,8 +24,6 @@ void print_usage(char ** argv) {
  * For debugging purposes, uses ASCII '0' and '1' rather than bitwise I/O.
  */
 void compressAscii(const string & infile, const string & outfile) {
-    cerr << "TODO: compress '" << infile << "' -> '"
-        << outfile << "' here (ASCII)" << endl;
     //open file 
     ifstream in;
     const char * input = infile.c_str();
@@ -42,13 +40,13 @@ void compressAscii(const string & infile, const string & outfile) {
     unsigned int len = in.tellg();
     if(len == 0) {
         cout << "input file opened but empty\n";
-        return;
+        //return;
     }
 
     //find beginning of stream
     in.seekg(0, ios_base::beg);
 
-    //read lines from stream
+    //get freqs from file
     vector<int> freqs(MAX_CHAR, 0); //one slot per ascii value = 0
     unsigned char nextChar;
     int nextByte, index;
@@ -74,19 +72,22 @@ void compressAscii(const string & infile, const string & outfile) {
         out << freqs[i] << endl;
     }
 
+    //close in stream
     if(in.is_open()) {
         in.close();
     }
-
+    
+    //reopen in stream
     in.open(input, ios::binary); //reopen input
 
+    //seek beginning again
     in.seekg(0, ios_base::beg);
 
+    //encode the file
     while((nextByte = in.get()) != EOF) { //read infile again
         nextChar = (unsigned char) nextByte;
         tree.encode(nextChar, out);
     }
-
     
     //close files
     if(out.is_open()) {
@@ -105,9 +106,6 @@ void compressAscii(const string & infile, const string & outfile) {
  * Uses bitwise I/O.
  */
 void compressBitwise(const string & infile, const string & outfile) {
-    // TODO (final)
-    cerr << "TODO: compress '" << infile << "' -> '"
-        << outfile << "' here (bitwise)" << endl;
     //open file 
     ifstream in;
     const char * input = infile.c_str();
@@ -130,7 +128,7 @@ void compressBitwise(const string & infile, const string & outfile) {
     //find beginning of stream
     in.seekg(0, ios_base::beg);
 
-    //read lines from stream
+    //get freqs
     vector<int> freqs(256, 0); 
     unsigned char nextChar;
     int nextByte, index;
@@ -152,28 +150,37 @@ void compressBitwise(const string & infile, const string & outfile) {
     BitOutputStream out(outS);
     
     //output header
-    unsigned int currentFreqs;
+    unsigned int currentFreqs, tmp;
     unsigned int mask = 0x1;
-    mask = mask << 31;
     for(int i = 0; i < 256; ++i) {
-	currentFreqs = freqs[i]; 
-	for (int k = 0; k < 32; ++k){
-            currentFreqs = currentFreqs & mask;
-	    if (currentFreqs != 0){ //if the bit is one
-	    	out.writeBit(1);
-	    }
-	    else{
-	    	out.writeBit(0);
-	    } 
-	}
-    }
+	    currentFreqs = freqs[i]; //get freq to encode
+        mask = 0x8000000; //init mask
 
+        //for each bit in int write a bit
+	    for (int k = 0; k < 32; ++k){
+            tmp = currentFreqs & mask;
+	        if (tmp != 0){ //if the bit is one
+	    	    out.writeBit(1);
+	        }
+	        else{
+	     	    out.writeBit(0);
+	        } 
+            mask = mask >> 1;
+	    }
+    }//done with header
+
+    //close in stream
     if(in.is_open()) {
         in.close();
     }
 
+    //reopen in stream
+    in.open(input, ios_base::binary);
+
+    //fdin beginning of file
     in.seekg(0, ios_base::beg);
 
+    //encode each char (bitwise)
     while((nextByte = in.get()) != EOF) { //read infile again
         nextChar = (unsigned char) nextByte;
         tree.encode(nextChar, out);
@@ -182,6 +189,9 @@ void compressBitwise(const string & infile, const string & outfile) {
     //close files
     if(in.is_open()) {
         in.close();
+    }
+    if(outBuf.is_open()) {
+        outBuf.close();
     }
     
     return;

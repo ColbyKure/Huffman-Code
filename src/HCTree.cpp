@@ -50,10 +50,6 @@ void HCTree::deleteTree(HCNode * subroot) {
 void HCTree::build(const vector<int>& freqs) {
     if(root != nullptr) {
         deleteTree(root);
-        for(int i = 0; i < 256; ++i) {
-            leaves[i] = nullptr;
-            encodings[i] = "";
-        }
     }
 
     priority_queue<HCNode*, vector<HCNode*>, HCNodePtrComp> pqueue;
@@ -70,6 +66,7 @@ void HCTree::build(const vector<int>& freqs) {
     }
     if(forestCount == 0) {
         root = nullptr;
+        return;
     }
 
     //get top 2 leaf nodes from pqueue to make subtree
@@ -96,6 +93,7 @@ void HCTree::build(const vector<int>& freqs) {
         parent = new HCNode(pCount, newSym, left, right);
         left->p = parent;
         right->p = parent;
+
         //add back into pqueue
         pqueue.push(parent);
     }
@@ -130,6 +128,7 @@ string HCTree::getPath(HCNode * leaf, HCNode * prev) {
         path = getPath(leaf->p, leaf);
     }
     if(prev == nullptr) {
+        //case of first call
         return path;
     }
     if(leaf->c0 == prev) {
@@ -165,8 +164,8 @@ void HCTree::encode(byte symbol, ostream& out) const {
 byte HCTree::decode(istream& in) const {
     HCNode * curr = root;
     unsigned char nextChar;
-    in >> nextChar;
-    while(true) {
+    while(root != nullptr) {
+        in >> nextChar;
         if(nextChar == '0') {
             curr = curr->c0;
         }
@@ -180,12 +179,9 @@ byte HCTree::decode(istream& in) const {
         if(in.eof()) {
             break;
         }
-        in >> nextChar;
     }
     return 0;
 }
-
-
 
 /** Write to the given BitOutputStream
  *  the sequence of bits coding the given symbol.
@@ -207,7 +203,6 @@ void HCTree::encode(byte symbol, BitOutputStream& out) const {
             out.writeBit(1); //true
         }
     }
-    out.flush();
     return;
 }
 
@@ -217,21 +212,23 @@ void HCTree::encode(byte symbol, BitOutputStream& out) const {
  */
 byte HCTree::decode(BitInputStream& in) const {
     HCNode * curr = root;
+    if(curr == nullptr) {
+        return 0;
+    }
     while(true) {
-        if(!in.readBit()) { //false
-            curr = curr->c0;
-        }
-        else {
-            curr = curr->c1;
-        }
         if(curr->c0 == nullptr) {
             //curr must be leaf node
+            //works for singleton case
             return curr->symbol;
         }
+        if(in.readBit()) { //false
+            curr = curr->c1;
+        }
+        else {
+            curr = curr->c0;
+        }
     }
-    return 0;
 }
-
 
 /**
  * Print the contents of a tree

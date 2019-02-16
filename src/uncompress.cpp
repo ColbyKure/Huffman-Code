@@ -25,9 +25,6 @@ void print_usage(char ** argv) {
  * For debugging purposes, uses ASCII '0' and '1' rather than bitwise I/O.
  */
 void uncompressAscii(const string & infile, const string & outfile) {
-    cerr << "TODO: uncompress '" << infile << "' -> '"
-        << outfile << "' here (ASCII)" << endl;
-    
     //open file 
     ifstream in;
     const char * input = infile.c_str();
@@ -38,7 +35,6 @@ void uncompressAscii(const string & infile, const string & outfile) {
         cout << "input file was not opened...\n";
         return;
     }
-
     
      //find beginning of stream
     in.seekg(0, ios_base::beg);
@@ -63,8 +59,8 @@ void uncompressAscii(const string & infile, const string & outfile) {
 	    return;
     }
     
+    //decode all characters in the file now
     unsigned char nextChar; //for reading output
-
     while(1) {
     	nextChar = tree.decode(in);
 	    if (in.eof()){
@@ -77,7 +73,6 @@ void uncompressAscii(const string & infile, const string & outfile) {
     if(out.is_open()){
     	out.close();
     }
-
     if(in.is_open()){
     	in.close();
     }
@@ -92,35 +87,35 @@ void uncompressAscii(const string & infile, const string & outfile) {
  * Uses bitwise I/O.
  */
 void uncompressBitwise(const string & infile, const string & outfile) {
-    // TODO (final)
-    cerr << "TODO: uncompress '" << infile << "' -> '"
-        << outfile << "' here (bitwise)" << endl;
     //open file 
     filebuf inF;
     const char * input = infile.c_str();
     inF.open(input, ios::binary);
-
-    //check if file actually opened 
-    /*if(!inF.is_open()) {
-        cout << "input file was not opened(bitwise)...\n";
-        return;
-    }*/
-
     istream inS(&inF);
 
     //find beginning of stream
     inS.seekg(0, ios_base::beg);
 
-    BitInputStream in(inS); 
+    //create BitInputStream object
+    BitInputStream in(inS);
 
     //read lines from header 
     vector<int> freqs(256, 0); //one slot per ascii value = 0
-    unsigned int nextInt;
+    unsigned int intMask = 0x1;
+    unsigned int nextInt = 0;
     unsigned int totalChars = 0;
-    for (int i = 0; i < 256; i++) {
-    	nextInt = in.getInt(); 
-    	freqs[i] = nextInt;
-        totalChars += nextInt;
+    for(int i = 0; i < 256; i++) {
+        //get int
+        intMask = 0x1;
+        for(int j = 0; j < 32; ++j) {
+            if(in.readBit()) {
+                nextInt = intMask | nextInt;
+            }
+            intMask = intMask << 1;
+        }
+        //nextInt holds full int now
+        freqs[i] = nextInt;
+        totalChars += nextInt; //summing the freqs
     }
 
     //build tree
@@ -129,14 +124,14 @@ void uncompressBitwise(const string & infile, const string & outfile) {
 
     //open out stream
     const char * output = outfile.c_str();
-    ofstream out(output);
+    ofstream out(output); //regular out
     if(!out.is_open()){
         cout << outfile << " not opened!\n";
 	    return;
     }
     
+    //decode each char 
     unsigned char nextChar; //for reading output
-
     for(unsigned int i = 0; i < totalChars; ++i) {
     	nextChar = tree.decode(in);
 	    out << nextChar;
@@ -146,10 +141,11 @@ void uncompressBitwise(const string & infile, const string & outfile) {
     if(out.is_open()){
     	out.close();
     }
-
     if(inF.is_open()){
     	inF.close();
     }
+
+    return;
 }
 
 int main(int argc, char ** argv) {
