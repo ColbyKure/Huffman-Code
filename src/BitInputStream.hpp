@@ -10,14 +10,13 @@ using namespace std;
 
 class BitInputStream {
 private:
-    char buf;
-    int nbits;
+    unsigned char buf;
+    unsigned int nbits;
     istream & in;
 
 public:
     BitInputStream(istream & i);
     bool readBit();
-    unsigned char getInt();
 };
 
 #endif // BITINPUTSTREAM_HPP

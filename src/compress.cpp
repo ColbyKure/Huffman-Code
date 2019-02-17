@@ -154,7 +154,7 @@ void compressBitwise(const string & infile, const string & outfile) {
     unsigned int mask = 0x1;
     for(int i = 0; i < 256; ++i) {
 	    currentFreqs = freqs[i]; //get freq to encode
-        mask = 0x8000000; //init mask
+        mask = 0x1 << 31; //init mask
 
         //for each bit in int write a bit
 	    for (int k = 0; k < 32; ++k){

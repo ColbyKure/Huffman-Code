@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "BitOutputStream.hpp"
 
 BitOutputStream::BitOutputStream(ostream & o) : out(o) {
@@ -13,7 +15,7 @@ void BitOutputStream::writeBit(bool bit) {
     if(bit == 1){ //true
         unsigned char mask = DEF_MASK;
         mask = mask << (BITS_IN_BYTE - nbits - 1);
-        mask = mask | buf;
+        buf = mask | buf;
     }
 
     nbits++;
@@ -24,5 +26,6 @@ void BitOutputStream::flush(){
     out.put(buf);
     out.flush();
     buf = 0;
+    nbits = 0;
     return;
 }

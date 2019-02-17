@@ -1,9 +1,8 @@
 #include "BitInputStream.hpp"
 
-BitInputStream::BitInputStream(istream & i) : in(i) {
-    buf = BITS_IN_BYTE;
-    nbits = 0;
-}
+#define BITS_IN_BYTE 8
+
+BitInputStream::BitInputStream(istream & i) : buf(0), nbits(8), in(i) { }
 
 bool BitInputStream::readBit() {
     if (nbits == BITS_IN_BYTE) {
@@ -24,8 +23,3 @@ bool BitInputStream::readBit() {
     }
 }
 
-unsigned char BitInputStream::getInt() {
-    unsigned char freq = -1;
-    in >> freq;
-    return freq;
-}
