@@ -1,4 +1,4 @@
-nclude <iostream>
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -32,11 +32,11 @@ void uncompressAscii(const string & infile, const string & outfile) {
 
     //check if file actually opened 
     if(!in.is_open()) {
-        cout << "input file was not opened...\n";
-        return;
+        cerr << "input file was not opened...\n";
+        //return;
     }
     
-     //find beginning of stream
+    //find beginning of stream
     in.seekg(0, ios_base::beg);
 
     //read lines from header 
@@ -55,8 +55,8 @@ void uncompressAscii(const string & infile, const string & outfile) {
     const char * output = outfile.c_str();
     ofstream out(output);
     if(!out.is_open()){
-        cout << outfile << " not opened!\n";
-	    return;
+        cerr << outfile << " not opened!\n";
+	    //return;
     }
     
     //decode all characters in the file now
@@ -77,7 +77,7 @@ void uncompressAscii(const string & infile, const string & outfile) {
     	in.close();
     }
 
-    return;
+    //return;
 }
 
 
@@ -126,8 +126,8 @@ void uncompressBitwise(const string & infile, const string & outfile) {
     const char * output = outfile.c_str();
     ofstream out(output); //regular out
     if(!out.is_open()){
-        cout << outfile << " not opened!\n";
-	    return;
+        cerr << outfile << " not opened!\n";
+	    //return;
     }
     
     //decode each char 
@@ -145,7 +145,7 @@ void uncompressBitwise(const string & infile, const string & outfile) {
     	inF.close();
     }
 
-    return;
+    //return;
 }
 
 int main(int argc, char ** argv) {

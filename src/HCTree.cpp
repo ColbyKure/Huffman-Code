@@ -24,7 +24,7 @@ HCTree::~HCTree() {
         leaves[i] = nullptr;
         encodings[i] = "";
     }
-    return;
+    //return;
 }
 
 /**
@@ -37,8 +37,9 @@ void HCTree::deleteTree(HCNode * subroot) {
     if(subroot->c1 != nullptr) {
         deleteTree(subroot->c1);
     }
+
     delete(subroot);
-    return;
+    //return;
 }
 
 /** Use the Huffman algorithm to build a Huffman coding tree.
@@ -100,7 +101,7 @@ void HCTree::build(const vector<int>& freqs) {
     root = parent;
 
     getEncodings();
-    return;
+    //return;
 }
 
 /**
@@ -153,7 +154,7 @@ void HCTree::encode(byte symbol, ostream& out) const {
     }
     encodedSymbol = encodings[(int)symbol];
     out << encodedSymbol;
-    return;
+    //return;
 }
 
 /** Return the symbol coded in the next sequence of bits (represented as 

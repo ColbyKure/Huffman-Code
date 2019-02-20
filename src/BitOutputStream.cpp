@@ -12,14 +12,16 @@ void BitOutputStream::writeBit(bool bit) {
         flush();
     }
 
-    if(bit == 1){ //true
+    buf = buf << 1;
+    buf = buf | bit;
+
+    /*if(bit == 1){ //true
         unsigned char mask = DEF_MASK;
         mask = mask << (BITS_IN_BYTE - nbits - 1);
         buf = mask | buf;
-    }
+    }*/
 
     nbits++;
-    return;
 }
 
 void BitOutputStream::flush(){
@@ -27,5 +29,4 @@ void BitOutputStream::flush(){
     out.flush();
     buf = 0;
     nbits = 0;
-    return;
 }

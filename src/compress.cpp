@@ -31,15 +31,15 @@ void compressAscii(const string & infile, const string & outfile) {
 
     //check if file actually opened 
     if(!in.is_open()) {
-        cout << "input file was not opened...\n";
-        return;
+        cerr << "input file was not opened...\n";
+        //return;
     }
 
     //check for empty file
     in.seekg(0, ios_base::end);
     unsigned int len = in.tellg();
     if(len == 0) {
-        cout << "input file opened but empty\n";
+        cerr << "input file opened but empty\n";
         //return;
     }
 
@@ -64,8 +64,8 @@ void compressAscii(const string & infile, const string & outfile) {
     const char * output = outfile.c_str();
     ofstream out(output);
     if(!out.is_open()) {
-        cout << outfile << " not opened!\n";
-        return;
+        cerr << outfile << " not opened!\n";
+        //return;
     }
     //output header
     for(int i = 0; i < MAX_CHAR; ++i) {
@@ -97,7 +97,7 @@ void compressAscii(const string & infile, const string & outfile) {
         in.close();
     }
 
-    return;
+    //return;
 }
 
 /**
@@ -113,16 +113,16 @@ void compressBitwise(const string & infile, const string & outfile) {
 
     //check if file actually opened 
     if(!in.is_open()) {
-        cout << "input file was not opened...\n";
-        return;
+        cerr << "input file was not opened...\n";
+        //return;
     }
 
     //check for empty file
     in.seekg(0, ios_base::end);
     unsigned int len = in.tellg();
     if(len == 0) {
-        cout << "input file opened but empty\n";
-        return;
+        cerr << "input file opened but empty\n";
+        //return;
     }
 
     //find beginning of stream
@@ -144,29 +144,37 @@ void compressBitwise(const string & infile, const string & outfile) {
     
     //open out stream
     const char * output = outfile.c_str();
-    filebuf outBuf;
-    outBuf.open(output, ios_base::binary);    
-    ostream outS(&outBuf);
-    BitOutputStream out(outS);
+    ofstream outBuf(output, ios::binary);
+    // outBuf.open(output, ios_base::binary); 
+    // outBuf << "THIS IS A TEST!!!@ PLS WRITE\n\n\n\n\n\n";
+    // ostream casted = (ostream)outBuf;
+    
+    // ostream outS(&outBuf);
+    BitOutputStream out(outBuf);
     
     //output header
     unsigned int currentFreqs, tmp;
     unsigned int mask = 0x1;
+
+    // SANITY TEST
+    /* for (int i=0; i < 256; i++) {
+        cout << "sanity test of freq: " << freqs[i] << "\n";
+    } */
+
+
+
     for(int i = 0; i < 256; ++i) {
-	    currentFreqs = freqs[i]; //get freq to encode
+	    currentFreqs = freqs[i]; ///get freq to encode
+cout << "current frequency is: " << hex << currentFreqs << endl;
         mask = 0x1 << 31; //init mask
 
         //for each bit in int write a bit
 	    for (int k = 0; k < 32; ++k){
-            tmp = currentFreqs & mask;
-	        if (tmp != 0){ //if the bit is one
-	    	    out.writeBit(1);
-	        }
-	        else{
-	     	    out.writeBit(0);
-	        } 
+            out.writeBit(currentFreqs & mask);
             mask = mask >> 1;
-	    }
+            //cout << "current mask is: " << hex << mask << endl;
+        }
+	        
     }//done with header
 
     //close in stream
@@ -194,7 +202,8 @@ void compressBitwise(const string & infile, const string & outfile) {
         outBuf.close();
     }
     
-    return;
+    //return;
+    
 }
 
 int main(int argc, char ** argv) {
@@ -224,5 +233,5 @@ int main(int argc, char ** argv) {
         compressAscii(infile, outfile);
     }
 
-    return 0;
+    return 0; //EXIT_SUCCESS
 }
