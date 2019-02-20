@@ -5,6 +5,9 @@
 #include <vector>
 
 #include "util.hpp"
+#include "BST.hpp"
+#include "BSTIterator.hpp"
+#include "BSTNode.hpp"
 
 using namespace std;
 
@@ -19,7 +22,7 @@ int main() {
     int currentStep;
     int numSteps = 20;
     
-    vector<long long> times(numTrials, 0);
+    vector<long long> times(numSteps, 0);
 
     Timer t;
 
@@ -35,23 +38,35 @@ int main() {
         double total = 0.0;
         for (int dataIndex = 0; dataIndex < numSteps; dataIndex++) {
             double currentRandom = distribution(generator);
+            currentRandom = (double)dataIndex;
             total += currentRandom;
             currentStep = dataSize + (stepSize * dataIndex);
 
-            //BST<double> bst;
+            BST<double> bst;
             set<double> set;
+            vector<double> nums;
             for (int inserting = 0; inserting < currentStep; inserting++){
                 set.insert(currentRandom);
+                bst.insert(currentRandom);
+                nums.push_back(currentRandom);
             }
             t.begin_timer();
-            /*
-            BSTIterator<double> it = bst.begin();
-            for (it; it != bst.end(); it++){
-                bst.find(*it);
+           
+            //BSTIterator<double> it = bst.begin();
+            //for (it; it != bst.end(); it++){
+              //  bst.find(*it);
+            //}
+            //double element = currentRandom;
+            //auto search = set.find(element);
+            for (int i = 0; i < nums.size(); ++i){
+                auto search = set.find(nums[i]);
+            }
+            /*for (int i = 0; i < nums.size(); ++i){
+                auto search = bst.find(nums[i]);
             }*/
-            double element = currentRandom;
-            auto search = set.find(element);
-            times[dataIndex] = t.end_timer() + times[dataIndex];
+            long long currTime = t.end_timer();
+            //currTime = currTime / currentStep;
+            times[dataIndex] =  currTime + times[dataIndex];
         }
     }
 
