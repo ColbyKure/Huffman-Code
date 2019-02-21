@@ -139,14 +139,17 @@ void uncompressBitwise(const string & infile, const string & outfile) {
     
     //decode each char 
     unsigned char nextChar; //for reading output
-    for(unsigned int i = 0; i < totalChars; ++i) {
+    unsigned int charsDecoded = 0;
+
+    totalChars--;
+    //totalChars--;
+    while(1) {
     	nextChar = tree.decode(in);
-	    if(i+1 == totalChars) break;
-        if(i == totalChars-3) {
-            cout << "found!\n";
-        }
         out << nextChar;
+        charsDecoded++;
+        if(charsDecoded == totalChars) { break; }
     }
+    out << endl;
 
     //close files
     if(out.is_open()){
