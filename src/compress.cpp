@@ -162,19 +162,16 @@ void compressBitwise(const string & infile, const string & outfile) {
     } */
 
 
-
+    //unsigned long nu = 0;
     for(int i = 0; i < 256; ++i) {
 	    currentFreqs = freqs[i]; ///get freq to encode
-cout << "current frequency is: " << hex << currentFreqs << endl;
         mask = 0x1 << 31; //init mask
-
         //for each bit in int write a bit
 	    for (int k = 0; k < 32; ++k){
-            out.writeBit(currentFreqs & mask);
+            bool qwe = (bool) (currentFreqs & mask);
+            out.writeBit((bool)(currentFreqs & mask));
             mask = mask >> 1;
-            //cout << "current mask is: " << hex << mask << endl;
-        }
-	        
+        } 
     }//done with header
 
     //close in stream

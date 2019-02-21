@@ -88,10 +88,8 @@ void uncompressAscii(const string & infile, const string & outfile) {
  */
 void uncompressBitwise(const string & infile, const string & outfile) {
     //open file 
-    filebuf inF;
     const char * input = infile.c_str();
-    inF.open(input, ios::binary);
-    istream inS(&inF);
+    ifstream inS(input, ios::binary);
 
     //find beginning of stream
     inS.seekg(0, ios_base::beg);
@@ -101,27 +99,32 @@ void uncompressBitwise(const string & infile, const string & outfile) {
 
     //read lines from header 
     vector<int> freqs(256, 0); //one slot per ascii value = 0
-    unsigned int intMask = 0x1;
     unsigned int nextInt = 0;
     unsigned int totalChars = 0;
-    for(int i = 0; i < 256; i++) {
-        //get int
-        intMask = 0x1;
-        for(int j = 0; j < 32; ++j) {
-            if(in.readBit()) {
-                nextInt = intMask | nextInt;
+    unsigned char currByte;
+    //get each int in vector
+    for(unsigned int i = 0; i < 256; i++) {
+        //get each byte from int
+        for(int j = 0; j < 4; ++j) {
+            //get each bit from byte
+            currByte = 0;
+            for(int k = 0; k < 8; k++) {
+                currByte = currByte << 1;
+                bool ret = in.readBit();
+                currByte = currByte | ret;
+                //if(ret)
+                  //  cout << "(i,j,k) = " << i << ", "<< j+1 << ", " << k+1 << endl;
             }
-            intMask = intMask << 1;
+            nextInt = nextInt << 8;
+            nextInt = nextInt | currByte;
         }
-        //nextInt holds full int now
         freqs[i] = nextInt;
-        totalChars += nextInt; //summing the freqs
+        totalChars += nextInt;
     }
 
     //build tree
     HCTree tree;
     tree.build(freqs);
-
     //open out stream
     const char * output = outfile.c_str();
     ofstream out(output); //regular out
@@ -141,8 +144,8 @@ void uncompressBitwise(const string & infile, const string & outfile) {
     if(out.is_open()){
     	out.close();
     }
-    if(inF.is_open()){
-    	inF.close();
+    if(inS.is_open()){
+    	inS.close();
     }
 
     //return;

@@ -4,15 +4,14 @@
 #include <iostream>
 
 #define BITS_IN_BYTE 8
-#define DEF_MASK 0x1
 
 using namespace std;
 
 class BitOutputStream {
 private:
-    unsigned char buf;
-    int nbits;
-    ostream & out;
+    unsigned char buf;      //8-bit buffer for our bit stream
+    unsigned int nbits;     //number of bits in buf
+    ostream & out;          //buffer to flush to
 
 public:
     BitOutputStream(ostream & o);

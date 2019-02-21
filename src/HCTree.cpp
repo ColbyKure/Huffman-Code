@@ -204,7 +204,7 @@ void HCTree::encode(byte symbol, BitOutputStream& out) const {
             out.writeBit(1); //true
         }
     }
-    return;
+    //return;
 }
 
 /** Return symbol coded in the next sequence of bits from the stream.
