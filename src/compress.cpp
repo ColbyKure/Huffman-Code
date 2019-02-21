@@ -190,6 +190,7 @@ void compressBitwise(const string & infile, const string & outfile) {
         nextChar = (unsigned char) nextByte;
         tree.encode(nextChar, out);
     }
+    out.flush();
     
     //close files
     if(in.is_open()) {
