@@ -42,10 +42,13 @@ void uncompressAscii(const string & infile, const string & outfile) {
     //read lines from header 
     vector<int> freqs(MAX_CHAR, 0); //one slot per ascii value = 0
     int nextInt;
+    int totalChars = 0;
     for (int i = 0; i < MAX_CHAR; i++) {
     	in >> nextInt;
     	freqs[i] = nextInt;
+        totalChars += nextInt;
     }
+    //in >> nextInt;
 
     //build tree
     HCTree tree;
@@ -61,6 +64,7 @@ void uncompressAscii(const string & infile, const string & outfile) {
     
     //decode all characters in the file now
     unsigned char nextChar; //for reading output
+    //for(int i = 0; i < totalChars; ++i) {
     while(1) {
     	nextChar = tree.decode(in);
 	    if (in.eof()){

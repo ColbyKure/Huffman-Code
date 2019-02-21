@@ -52,12 +52,6 @@ int main() {
             }
             t.begin_timer();
            
-            //BSTIterator<double> it = bst.begin();
-            //for (it; it != bst.end(); it++){
-              //  bst.find(*it);
-            //}
-            //double element = currentRandom;
-            //auto search = set.find(element);
             for (int i = 0; i < nums.size(); ++i){
                 auto search = set.find(nums[i]);
             }
